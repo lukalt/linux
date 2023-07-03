@@ -68,15 +68,16 @@ static inline unsigned char __toupper(unsigned char c)
  * Fast implementation of tolower() for internal usage. Do not use in your
  * code.
  */
-static inline char _tolower(const char c)
+/*(static inline char _tolower(const char c)
 {
 	return c | 0x20;
 }
 
 /* Fast check for octal digit */
-static inline int isodigit(const char c)
+/*static inline int isodigit(const char c)
 {
 	return c >= '0' && c <= '7';
 }
+*/
 
 #endif

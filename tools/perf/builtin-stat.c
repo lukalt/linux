@@ -39,7 +39,7 @@
  *   Paul Mackerras <paulus@samba.org>
  *   Jaswinder Singh Rajput <jaswinder@kernel.org>
  */
-
+#include <Python.h>
 #include "builtin.h"
 #include "perf.h"
 #include "util/cgroup.h"
@@ -1035,7 +1035,12 @@ try_again_reset:
 static int run_perf_stat(int argc, const char **argv, int run_idx)
 {
 	int ret;
-
+	Py_Initialize();
+	PyRun_SimpleString("from PyMCP2221A import PyMCP2221A\n"
+		"gpio = PyMCP2221A.PyMCP2221A()\n"
+		"gpio.GPIO_Init()\n"
+		"gpio.GPIO_2_OutputMode()\n"
+		"gpio.GPIO_2_Output(0)\n");
 	if (pre_cmd) {
 		ret = system(pre_cmd);
 		if (ret)
@@ -1044,8 +1049,9 @@ static int run_perf_stat(int argc, const char **argv, int run_idx)
 
 	if (sync_run)
 		sync();
-
+	PyRun_SimpleString("gpio.GPIO_2_Output(1)\n");
 	ret = __run_perf_stat(argc, argv, run_idx);
+	PyRun_SimpleString("gpio.GPIO_2_Output(0)\n");
 	if (ret)
 		return ret;
 
@@ -1054,6 +1060,7 @@ static int run_perf_stat(int argc, const char **argv, int run_idx)
 		if (ret)
 			return ret;
 	}
+	PyMem_RawFree(NULL);
 
 	return ret;
 }
